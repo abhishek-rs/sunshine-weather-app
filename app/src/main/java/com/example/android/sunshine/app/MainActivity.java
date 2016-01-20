@@ -1,9 +1,12 @@
 package com.example.android.sunshine.app;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -44,7 +47,15 @@ public class MainActivity extends ActionBarActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
+    public void sendMessage(View view){
+        //show toast message because it was clicked
 
+        Context context = getApplicationContext();
+        String buttonTxt = "aHelllo!";
+        //make toast and show it
+        Toast toast = Toast.makeText(context, "This button will launch my " +buttonTxt+ " app!", Toast.LENGTH_SHORT);
+        toast.show();
+    }
 }
 
 
