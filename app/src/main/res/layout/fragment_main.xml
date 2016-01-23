@@ -13,7 +13,7 @@
         android:id="@+id/listview_forecast"
         android:padding="10dp"
         android:clickable="true"
-        android:focusable="false" />
+        android:focusable="true" />
 
 </FrameLayout>
 

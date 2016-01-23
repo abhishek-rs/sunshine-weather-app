@@ -1,8 +1,11 @@
 package com.example.android.sunshine.app;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -15,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,20 +31,42 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by I311917 on 1/13/2016.
  */
     public class ForecastFragment extends Fragment {
     private ArrayAdapter<String> mForecastAdapter;
+    //private String postalcode;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
+    private void updateWeather(){
+        FetchWeatherTask task = new FetchWeatherTask();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+        String temp_type = prefs.getString(getString(R.string.pref_temperature_list_key),getString(R.string.pref_temperature_list_default));
+        String[] params = new String[2];
+        params[0] = location;
+        params[1] = temp_type;
+      //  Toast.makeText(getActivity(), params[1], Toast.LENGTH_LONG).show();
+        task.execute(params);
+    }
+
     public ForecastFragment() {
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+       // SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.pref_location_key), Context.MODE_PRIVATE);
+       // postalcode = sharedPref.getString(getString(R.string.pref_location_key), "560072");
+
     }
 
     @Override
@@ -60,8 +84,8 @@ import java.util.List;
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            FetchWeatherTask task = new FetchWeatherTask();
-            task.execute("560072");
+            updateWeather();
+            return true;
 
         }
 
@@ -72,38 +96,35 @@ import java.util.List;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        String[] data = {
-                "Today - Sunny - 55",
-                "Today - Sunny - 55",
-                "Today - Sunny - 55",
-                "Today - Sunny - 55",
-                "Today - Sunny - 55",
-                "Today - Sunny - 55",
-                "Today - Sunny - 55",
-                "Today - Sunny - 55"};
 
 
-       List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
+
+     //  List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
         mForecastAdapter = new ArrayAdapter<String>(
                 getActivity(), // The current context (this activity)
                 R.layout.list_item_forecast, // The name of the layout ID.
                 R.id.list_item_forecast_textview, // The ID of the textview to populate.
-                weekForecast);
+                new ArrayList<String>());
         ListView forecastList = (ListView) rootView.findViewById(R.id.listview_forecast);
         forecastList.setAdapter(mForecastAdapter);
+
         forecastList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                                @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                                String forecast = mForecastAdapter.getItem(position);
-                                Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
-                           }
-                    });
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                String forecast = mForecastAdapter.getItem(position);
+               // Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
+                Intent detailIntent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, forecast);
+                startActivity(detailIntent);
+            }
+        });
 
 
 
-        FetchWeatherTask task = new FetchWeatherTask();
-        task.execute("560072");
+
+
+       // FetchWeatherTask task = new FetchWeatherTask();
+        //task.execute(location);
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
@@ -142,10 +163,12 @@ import java.util.List;
             BufferedReader reader = null;
             String forecastJsonStr = null;
             String postcode = params[0];
+            String temp_type = params[1];
+
             String mode = "json";
             String units = "metric";
             String count = "7";
-            String appid = "xx";
+            String appid = "f43d3eb7fa1f40e334b2b965572b5b66";
             int numDays = 7;
             final String BASE_URL  = "http://api.openweathermap.org/data/2.5/forecast/daily";
             final String PARAM_QUERY = "q";
@@ -240,11 +263,11 @@ import java.util.List;
             }
 
             try {
-                return getWeatherDataFromJson(forecastJsonStr,numDays);
+                return getWeatherDataFromJson(forecastJsonStr,numDays,temp_type);
             }
             catch (JSONException e){
                 Log.e("ForecastFragment", "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
+                // If the code didn't successfully get the weather data, there's no point in attempting
                 // to parse it.
                 return null;
             }
@@ -279,7 +302,7 @@ import java.util.List;
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+        private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays, String temp_type)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
@@ -338,6 +361,15 @@ import java.util.List;
                 double high = temperatureObject.getDouble(OWM_MAX);
                 double low = temperatureObject.getDouble(OWM_MIN);
 
+                if (temp_type.equals("1")){
+                    high = 1.8*high + 32;
+                    low = 1.8*high + 32;
+                }
+
+                else if (temp_type.equals("2")){
+                    high = high + 273.15;
+                    low = low + 273.15;
+                }
                 highAndLow = formatHighLows(high, low);
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
