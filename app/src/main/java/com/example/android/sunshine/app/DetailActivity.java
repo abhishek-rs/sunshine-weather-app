@@ -1,32 +1,29 @@
 package com.example.android.sunshine.app;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
 
-public class MainActivity extends ActionBarActivity {
+public class DetailActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ForecastFragment())
-                    .commit();
-        }
+        setContentView(R.layout.activity_detail);
+      /*  Intent intent = getIntent();
+        String message = intent.getStringExtra(Intent.EXTRA_TEXT);
+        TextView detailTextView = (TextView) findViewById(R.id.detail_textview);
+        detailTextView.setText(message);*/
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.menu_detail, menu);
         return true;
     }
 
@@ -41,27 +38,8 @@ public class MainActivity extends ActionBarActivity {
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
-
-            //Intent detailIntent = new Intent(this, DetailActivity.class);
-            //startActivity(detailIntent);
         }
 
         return super.onOptionsItemSelected(item);
     }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public void sendMessage(View view){
-        //show toast message because it was clicked
-
-        Context context = getApplicationContext();
-        String buttonTxt = "aHelllo!";
-        //make toast and show it
-        Toast toast = Toast.makeText(context, "This button will launch my " +buttonTxt+ " app!", Toast.LENGTH_SHORT);
-        toast.show();
-    }
 }
-
-
-

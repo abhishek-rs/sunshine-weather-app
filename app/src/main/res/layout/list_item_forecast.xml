@@ -5,13 +5,13 @@
     android:textSize="30sp"
     android:gravity="center_vertical|center_horizontal"
     android:textAlignment="gravity"
-    android:clickable="true"
+    android:clickable="false"
     android:background="#81BEF7"
     android:minHeight="50dp"
     android:textColor="#ffffff"
     android:textColorHighlight="#000000"
     android:padding="10dp"
-    android:focusable="true"
-    android:enabled="true">
+    android:focusable="false"
+    android:enabled="false">
 
 </TextView>
