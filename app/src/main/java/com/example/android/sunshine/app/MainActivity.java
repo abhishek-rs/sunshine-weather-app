@@ -2,12 +2,19 @@ package com.example.android.sunshine.app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -44,6 +51,25 @@ public class MainActivity extends ActionBarActivity {
 
             //Intent detailIntent = new Intent(this, DetailActivity.class);
             //startActivity(detailIntent);
+        }
+
+        else if (id == R.id.action_map) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            String location = prefs.getString(getString(R.string.pref_location_key),
+                    getString(R.string.pref_location_default));
+            Uri locationUri = Uri.parse("geo:0,0?q=" + location);
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, locationUri);
+
+// Verify it resolves
+            PackageManager packageManager = getPackageManager();
+            List<ResolveInfo> activities = packageManager.queryIntentActivities(mapIntent, 0);
+            boolean isIntentSafe = activities.size() > 0;
+
+// Start an activity if it's safe
+            if (isIntentSafe) {
+                startActivity(mapIntent);
+            }
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

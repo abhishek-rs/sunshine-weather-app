@@ -86,8 +86,8 @@ import java.util.ArrayList;
         if (id == R.id.action_refresh) {
             updateWeather();
             return true;
-
         }
+
 
         return super.onOptionsItemSelected(item);
     }
