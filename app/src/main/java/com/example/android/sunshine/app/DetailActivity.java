@@ -24,6 +24,7 @@ public class DetailActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_detail, menu);
+
         return true;
     }
 
@@ -39,7 +40,16 @@ public class DetailActivity extends ActionBarActivity {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
+       /* else if (id == R.id.menu_item_share){
+            Intent intent = getIntent();
+            String forecastStr = "OOps!"
+            if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
+                forecastStr = intent.getStringExtra(Intent.EXTRA_TEXT);
+            }
 
+            startActivity(shareIntent);
+        }*/
         return super.onOptionsItemSelected(item);
     }
+
 }
